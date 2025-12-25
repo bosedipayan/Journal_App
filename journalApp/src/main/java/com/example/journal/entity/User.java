@@ -1,5 +1,6 @@
 package com.example.journal.entity;
 
+import lombok.Data;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "users")
+@Data
 public class User {
     @Id
     private ObjectId id;
