@@ -1,7 +1,9 @@
 package com.example.journal.controller;
 
 import com.example.journal.entity.JournalEntry;
+import com.example.journal.entity.User;
 import com.example.journal.service.JournalEntryService;
+import com.example.journal.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,16 +20,29 @@ public class JournalEntryController {
     @Autowired
     private JournalEntryService journalEntryService;
 
-    @GetMapping
-    public List<JournalEntry> getAllEntries() {
-        return journalEntryService.getAllEntries();
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("{username}")
+    public ResponseEntity<?> getAllJournalEntriesOfUser(@PathVariable String username) {
+        Optional<User> user = userService.findByUsername(username);
+        List<JournalEntry> all = user.get().getJournalEntries();
+        if(all != null && !all.isEmpty()) {
+            return new  ResponseEntity<>(all, HttpStatus.OK);
+        }
+        return new ResponseEntity<>("No journal entries found for user: " + username, HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping
-    public JournalEntry addEntry(@RequestBody JournalEntry entry) {
-        entry.setDate(LocalDateTime.now());
-        journalEntryService.saveEntry(entry);
-        return entry;
+    @PostMapping("{username}")
+    public ResponseEntity<JournalEntry> createEntry(@RequestBody JournalEntry entry, @PathVariable String username) {
+        try {
+            entry.setDate(LocalDateTime.now());
+            journalEntryService.saveEntry(entry, username);
+
+            return new ResponseEntity<>(entry, HttpStatus.CREATED);
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("find/{id}")
@@ -56,7 +71,7 @@ public class JournalEntryController {
                     updatedEntry.getContent() : old.getContent());
             old.setDate(LocalDateTime.now());
         }
-        journalEntryService.saveEntry(old);
+        journalEntryService.saveEntry(old, null);
         return old;
     }
 }
