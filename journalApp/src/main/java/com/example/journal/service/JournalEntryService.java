@@ -37,7 +37,10 @@ public class JournalEntryService{
         return journalEntryRepository.findById(id);
     }
 
-    public void deleteById(ObjectId id) {
+    public void deleteById(ObjectId id, String username) {
+        Optional<User> user = userService.findByUsername(username);
+        user.get().getJournalEntries().removeIf(entry -> entry.getId().equals(id));
+        userService.saveEntry(user.get());
         journalEntryRepository.deleteById(id);
     }
 
