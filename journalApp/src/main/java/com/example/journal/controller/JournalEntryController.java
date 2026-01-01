@@ -62,8 +62,8 @@ public class JournalEntryController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("update/{id}")
-    public JournalEntry updateEntry(@PathVariable ObjectId id, @RequestBody JournalEntry updatedEntry) {
+    @PutMapping("update/{username}/{id}")
+    public JournalEntry updateEntry(@PathVariable ObjectId id, @RequestBody JournalEntry updatedEntry, @PathVariable String username) {
         JournalEntry old = journalEntryService.findById(id).orElse(null);
         if (old != null) {
             old.setTitle(updatedEntry.getTitle() != null || updatedEntry.getTitle().isEmpty() ?
@@ -72,7 +72,7 @@ public class JournalEntryController {
                     updatedEntry.getContent() : old.getContent());
             old.setDate(LocalDateTime.now());
         }
-        journalEntryService.saveEntry(old, null);
+        journalEntryService.updateEntry(old);
         return old;
     }
 }
