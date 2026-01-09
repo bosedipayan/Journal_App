@@ -28,7 +28,6 @@ public class JournalEntryService{
         JournalEntry save = journalEntryRepository.save(entry);
         user.getJournalEntries().add(save);
 
-        user.setUsername(null);
         userService.saveEntry(user);
     }
 
