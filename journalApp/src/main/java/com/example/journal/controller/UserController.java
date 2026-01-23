@@ -23,7 +23,7 @@ public class UserController {
 
     @PostMapping
     public void addNewUser(@RequestBody User user){
-        userService.saveEntry(user);
+        userService.saveNewEntryWithSecurity(user);
     }
 
     @PutMapping("/{username}")
