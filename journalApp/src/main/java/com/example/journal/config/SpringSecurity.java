@@ -27,18 +27,20 @@ public class SpringSecurity {
     private UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/**", "/journal/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/users/**", "/public/**").permitAll()
+                        .requestMatchers("/journal/**").authenticated()
+                        .anyRequest()
+                        .authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
+
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -49,6 +51,4 @@ public class SpringSecurity {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
-

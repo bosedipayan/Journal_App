@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,11 +44,32 @@ public class JournalEntryService{
         return journalEntryRepository.findById(id);
     }
 
-    public void deleteById(ObjectId id, String username) {
+    @Transactional
+    public boolean deleteById(ObjectId id, String username) {
+        boolean b=false;
+        try {
+            Optional<User> user = userService.findByUsername(username);
+            b = user.get().getJournalEntries().removeIf(entry -> entry.getId().equals(id));
+            if(b)
+            {
+                userService.saveEntry(user.get());
+                journalEntryRepository.deleteById(id);
+            }
+
+        }
+        catch (Exception e){
+            System.out.println(e);
+            throw new RuntimeException("An error occurred while deleting the journal entry.");
+        }
+        return b;
+    }
+
+    public List<JournalEntry> findByUsername(String username) {
         Optional<User> user = userService.findByUsername(username);
-        user.get().getJournalEntries().removeIf(entry -> entry.getId().equals(id));
-        userService.saveEntry(user.get());
-        journalEntryRepository.deleteById(id);
+        if(user.isPresent()) {
+            return user.get().getJournalEntries();
+        }
+        return new ArrayList<>();
     }
 
 }
