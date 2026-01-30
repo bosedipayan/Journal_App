@@ -31,10 +31,10 @@ public class SpringSecurity {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/**", "/public/**").permitAll()
-                        .requestMatchers("/journal/**").authenticated()
+                        .requestMatchers("/users/**", "/public/**", "/journal/**").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest()
-                        .authenticated()
+                        .permitAll()
                 )
                 .httpBasic(Customizer.withDefaults());
 
