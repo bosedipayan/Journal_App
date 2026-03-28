@@ -1,0 +1,10 @@
+spring:
+    data:
+        prod: dev
+
+
+logging:
+  level:
+    net:
+      example:
+        journal: DEBUG
