@@ -2,7 +2,9 @@ package com.example.journal.controller;
 
 import com.example.journal.entity.User;
 import com.example.journal.repository.UserRepository;
+import com.example.journal.response.WeatherResponse;
 import com.example.journal.service.UserService;
+import com.example.journal.service.WeatherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +21,7 @@ public class UserController {
     @Autowired
     private UserService userService;
     private UserRepository userRepository;
-
-//    @GetMapping
-//    public List<User> getAllUsers() {
-//        return userService.getAllUsers();
-//    }
-//
-//    @PostMapping
-//    public void addNewUser(@RequestBody User user){
-//        userService.saveNewEntryWithSecurity(user);
-//    }
+    private WeatherService weatherService;
 
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody User user){
@@ -52,5 +45,16 @@ public class UserController {
         userRepository.deleteEntryById(currentUsername);
 
         return new ResponseEntity<>(HttpStatus.GONE);
+    }
+
+
+    @GetMapping
+    public ResponseEntity<?> greetings(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        WeatherResponse wth = weatherService.getWeather("Pune");
+
+        return new ResponseEntity<>("Hi" + auth.getName(),
+                HttpStatus.OK);
     }
 }
