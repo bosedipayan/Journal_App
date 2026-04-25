@@ -21,17 +21,31 @@ public class WeatherService {
     @Autowired
     private AppCache appCache;
 
+    @Autowired
+    private  RedisService redisService;
+
     public WeatherResponse getWeather(String city) {
-        String finalAPI = appCache.APP_CACHE.get("weather_api").replace("API_KEY", apiKey).replace("CITY", city);
+        WeatherResponse value = redisService.getValue("weather_of" + city, WeatherResponse.class);
+        if(value != null){
+            return value;
+        }
+        else {
+            String finalAPI = appCache.APP_CACHE.get("weather_api").replace("API_KEY", apiKey).replace("CITY", city);
 
-        String requestBody = "{}";
+            String requestBody = "{}";
 
-        User userBuild = User.builder().username("test").password("test").build();
-        HttpEntity<User> requestEntity = new HttpEntity<>(userBuild);
+            User userBuild = User.builder().username("test").password("test").build();
+            HttpEntity<User> requestEntity = new HttpEntity<>(userBuild);
 
-        ResponseEntity<WeatherResponse> response = restTemplate.exchange(finalAPI, HttpMethod.POST, requestEntity,
-                WeatherResponse.class);
-        WeatherResponse body = response.getBody();
-        return body;
+            ResponseEntity<WeatherResponse> response = restTemplate.exchange(finalAPI, HttpMethod.POST, requestEntity,
+                    WeatherResponse.class);
+            WeatherResponse body = response.getBody();
+
+            if(body != null)
+            {
+                redisService.setValue("weather_of" + city, body, 3600);
+            }
+            return body;
+        }
     }
 }
