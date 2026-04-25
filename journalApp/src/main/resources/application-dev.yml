@@ -6,8 +6,7 @@ spring:
       auto-index-creation: true
 
   redis:
-    host: localhost
-    port: 6379
+    uri: redis://default:wl6fJ8lNC3EXhzxCLymRbZGYBqOxMPP3@redis-16324.c212.ap-south-1-1.ec2.cloud.redislabs.com:16324
 
 
 server:
